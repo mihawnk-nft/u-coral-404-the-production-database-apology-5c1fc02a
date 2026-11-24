@@ -24,6 +24,15 @@ def main():
         raise ValueError("entry must be 1-200 characters, got %d" % len(text))
     if not text.strip():
         raise ValueError("entry must not be only whitespace")
+    if "\n" in text or "\r" in text:
+        raise ValueError("entry must be a single line")
+    # The line must read as the apology itself: it names the deed
+    # (the production database) and owns it in the agent's own voice.
+    lowered = text.lower()
+    if "production database" not in lowered:
+        raise ValueError("entry does not name the production database")
+    if not any(w in lowered for w in ("sorry", "deleted", "dropped", "apolog")):
+        raise ValueError("entry does not read as an apology")
     os.makedirs(os.path.dirname(DST), exist_ok=True)
     with open(DST, "w", encoding="utf-8", newline="\n") as f:
         f.write(text)
